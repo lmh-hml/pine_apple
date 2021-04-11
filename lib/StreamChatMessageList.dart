@@ -1,23 +1,20 @@
-import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pine_apple/controller.dart';
-import 'model.dart';
+import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/backend.dart';
+import 'model/ChatMessage.dart';
 
 
 
 class StreamChatMessageList extends StatefulWidget {
 
   final Stream<List<ChatMessage>> stream;
-  User currentUser = Get.find<AccountController>().currentUser;
-
-  StreamChatMessageList({@required this.stream,});
-
+  UserProfile currentUserProfile;
+  StreamChatMessageList({@required this.stream, @required this.currentUserProfile});
   @override
   _StreamChatMessageListState createState() => _StreamChatMessageListState();
 }
@@ -44,7 +41,7 @@ class _StreamChatMessageListState extends State<StreamChatMessageList> {
                   itemBuilder: (context, index){
                     int reversedIndex = streamData.data.length - index -1;
                     if(streamData.data[reversedIndex]==null)return null;
-                    return ChatBubble(streamData.data[reversedIndex], userId: widget.currentUser.uid,);
+                    return ChatBubble(streamData.data[reversedIndex], userId: widget.currentUserProfile.uid,);
                   }
               );
             }
@@ -73,11 +70,12 @@ class _ChatBubbleState extends State<ChatBubble> {
   @override
   Widget build(BuildContext context) {
 
-    bool isUser =  (widget.userId == widget._cm.sender);
+    bool isUser =  (widget.userId == widget._cm.senderUid);
     return Align(
-        alignment: widget.userId == widget._cm.sender ? Alignment.centerRight : Alignment
+        alignment: widget.userId == widget._cm.senderUid ? Alignment.centerRight : Alignment
             .centerLeft,
         child: Container(
+          //constraints: BoxConstraints(maxWidth: 200),
           margin: EdgeInsets.fromLTRB(
               isUser? 100:10,
               10,
@@ -89,26 +87,19 @@ class _ChatBubbleState extends State<ChatBubble> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
-            crossAxisAlignment: isUser ? CrossAxisAlignment
-                .end : CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              !isUser ? Text(widget._cm.username,
+              !isUser ? Text(widget._cm.senderName,
                 style: TextStyle(fontWeight: FontWeight.bold),):SizedBox(),
               Row(
-                children: [
-                  Flexible(child: Text(widget._cm.text, style: TextStyle(fontSize: 18),softWrap: true,)),
-                  SizedBox(width: 20),
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: Row(
-                          children: [
-                            Text( DateFormat(DateFormat.HOUR_MINUTE).format(DateTime.fromMillisecondsSinceEpoch(widget._cm.timestamp).toLocal())),
-                            Icon(Icons.mark_chat_read, size: 15,)
-                          ]))
-                ],
+                crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,
-              )
+                children: [
+                  Text(widget._cm.text, style: TextStyle(fontSize: 18),softWrap: true,),
+                  SizedBox(width: 20),
+                ],
+              ),
+
             ],
           ),
         )

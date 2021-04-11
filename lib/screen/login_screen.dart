@@ -1,18 +1,27 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart';
-import 'root.dart';
+import 'package:pine_apple/controller/login_page_controller.dart';
+import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:pine_apple/import_firebase.dart';
+import 'package:rxdart/rxdart.dart';
 
 
-class LoginPage extends StatefulWidget {
+
+class LoginScreen extends StatefulWidget {
+
+  final LoginPageController controller = LoginPageController(PineAppleContext.auth);
+
+  LoginScreen();
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _pwdController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    //Size size = MediaQuery.of(context).size;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -35,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(left: 50.0, top: 150.0, right: 50.0, bottom: 0.0),
                 child: TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                       labelText: "Email"
                   ),
@@ -46,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.center,
                 margin: EdgeInsets.only(left: 50.0, top: 0.0, right: 50.0,bottom: 0.0),
                 child: TextField(
+                  controller: _pwdController,
                   obscureText: _isObscure,
                   decoration: InputDecoration(
                     labelText: "Password",
@@ -66,9 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.centerRight,
                 margin: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                 child: GestureDetector(
-                  onTap: () => {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage() ))
-                  },
+                  onTap: registerButtonCallback,
                   child: Text(
                     "Don't Have an Account? Sign up",
                     style: TextStyle(
@@ -80,15 +89,26 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
+          StreamBuilder(
+              stream: widget.controller.errorStream,
+              builder: (context, snapshot){
+                if(snapshot.hasData)
+                  {
+                    return Text(snapshot.data, style: TextStyle(
+                      color: Colors.red,
+                    ),);
+                  }
+                else{
+                  return Text("");
+                }
+              }),
 //Login button
               Container(
                 margin: EdgeInsets.only(left: 150.0, top: 140.0, right: 50.0, bottom: 0.0),
                 child: ConstrainedBox(
                   constraints: BoxConstraints.tightFor(width: 200, height: 50),
                   child: ElevatedButton(
-                  onPressed: () => {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Root() ))
-                  },
+                    onPressed: logInButtonCallback,
                     child: Text(
                       "LOGIN",
                       textAlign: TextAlign.center,
@@ -113,6 +133,20 @@ class _LoginPageState extends State<LoginPage> {
         ),
     );
   }
+
+  //UI FUNCTIONS
+  void logInButtonCallback()
+  {
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => Root() ));
+    widget.controller.onLogIn(_emailController.text, _pwdController.text);
+  }
+
+  void registerButtonCallback()
+  {
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => Register() ));
+    widget.controller.onRegister();
+  }
+
 }
 
 

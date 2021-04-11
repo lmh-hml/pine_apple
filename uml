@@ -1,0 +1,591 @@
+@startuml
+set namespaceSeparator ::
+
+class "pine_apple::chat.dart::PineAppleChat" {
+  +String* chatId
+  +_PineAppleChatState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::chat.dart::PineAppleChat"
+
+class "pine_apple::chat.dart::_PineAppleChatState" {
+  +TextEditingController* messageTextController
+  +ChatSessionReference* chatController
+  -ProfilesRepository* _userController
+  +void initState()
+  +void dispose()
+  +Widget* build()
+  +Widget* ChatAppBar()
+  -Widget* _chatOptionsButton()
+  -void _onGroupinfoOption()
+  -void _onChatInfoButton()
+  +void onMessageAvailable()
+  +void createAndUploadMessage()
+}
+
+"pine_apple::chat.dart::_PineAppleChatState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController*"
+"pine_apple::chat.dart::_PineAppleChatState" o-- "pine_apple::model::chat_repository.dart::ChatSessionReference*"
+"pine_apple::chat.dart::_PineAppleChatState" o-- "pine_apple::model::profiles_repository.dart::ProfilesRepository*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::chat.dart::_PineAppleChatState"
+
+class "pine_apple::controller::controller2.dart::ChatSession" {
+  -DatabaseReference* _chatGroupReference
+  -DatabaseReference* _messagesRef
+  -FirebaseList* _fbl
+  -List<ChatMessage*>* _messageList
+  -StreamController<List<ChatMessage*>*>* _messageStream
+  +Stream<List<ChatMessage*>*>* stream
+  +void setChatGroup()
+  +void addMessage()
+  +void dispose()
+}
+
+"pine_apple::controller::controller2.dart::ChatSession" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+"pine_apple::controller::controller2.dart::ChatSession" o-- "firebase_database::ui::firebase_list.dart::FirebaseList*"
+"pine_apple::controller::controller2.dart::ChatSession" o-- "dart::async::StreamController<List<ChatMessage*>*>*"
+"pine_apple::controller::controller2.dart::ChatSession" o-- "dart::async::Stream<List<ChatMessage*>*>*"
+
+class "pine_apple::controller::controller2.dart::ChatRepository" {
+  -DatabaseReference* _chatsReference
+  +Future<String*>* createChatGroup()
+}
+
+"pine_apple::controller::controller2.dart::ChatRepository" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+
+class "pine_apple::controller::controller2.dart::AuthService" {
+  -FirebaseAuth* _auth
+  -DatabaseReference* _users
+  +User* currentUser
+  +String* currentUserUid
+  +Stream<dynamic>* userAuthState
+  +Future<User*>* signIn()
+  +Future<User*>* register()
+  +void delete()
+  +Future<void>* signOut()
+}
+
+"pine_apple::controller::controller2.dart::AuthService" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth*"
+"pine_apple::controller::controller2.dart::AuthService" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+"pine_apple::controller::controller2.dart::AuthService" o-- "firebase_auth::firebase_auth.dart::User*"
+"pine_apple::controller::controller2.dart::AuthService" o-- "dart::async::Stream<dynamic>*"
+
+class "pine_apple::controller::controller2.dart::ProfilesRepository" {
+  -DatabaseReference* _usersReference
+  +Stream<dynamic>* profileStream
+  +Future<UserProfile*>* getUserProfile()
+  +void updateProfile()
+}
+
+"pine_apple::controller::controller2.dart::ProfilesRepository" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+"pine_apple::controller::controller2.dart::ProfilesRepository" o-- "dart::async::Stream<dynamic>*"
+
+class "pine_apple::controller::controller2.dart::UserProfileReference" {
+  -DatabaseReference* _profileReference
+  -StreamController<UserProfile*>* _profileStream
+  -String* _uid
+  -UserProfile* _userProfile
+  +Stream<UserProfile*>* profileStream
+  +UserProfile* currentUserProfile
+  +Future<void>* updateProfile()
+  +Future<void>* deleteProfile()
+  +Future<UserProfile*>* snapshot()
+}
+
+"pine_apple::controller::controller2.dart::UserProfileReference" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+"pine_apple::controller::controller2.dart::UserProfileReference" o-- "dart::async::StreamController<UserProfile*>*"
+"pine_apple::controller::controller2.dart::UserProfileReference" o-- "pine_apple::model.dart::UserProfile*"
+"pine_apple::controller::controller2.dart::UserProfileReference" o-- "dart::async::Stream<UserProfile*>*"
+
+class "pine_apple::controller::controller2.dart::RegisterService" {
+  {static} +String* NONE
+  +String* pwdInvalidText
+  +String* userNameInvalidText
+  +String* emailInvalidText
+  -AuthService* _account
+  +String* lastErrorCode
+  +Future<User*>* register()
+  +bool* isPasswordStrong()
+  +bool* isUsernameValid()
+}
+
+"pine_apple::controller::controller2.dart::RegisterService" o-- "pine_apple::controller::controller2.dart::AuthService*"
+
+class "pine_apple::controller::login_page_controller.dart::LoginPageController" {
+  -AuthService* _auth
+  -TextEditingController* _emailController
+  -TextEditingController* _pwdController
+  +TextEditingController* emailController
+  +TextEditingController* passwordController
+  +Future<void>* onLogIn()
+  +void onRegister()
+}
+
+"pine_apple::controller::login_page_controller.dart::LoginPageController" o-- "pine_apple::model::auth_service.dart::AuthService*"
+"pine_apple::controller::login_page_controller.dart::LoginPageController" o-- "flutter::src::widgets::editable_text.dart::TextEditingController*"
+
+class "pine_apple::controller::register_page_controller.dart::RegisterPageController" {
+  {static} +String* NONE
+  +String* pwdInvalidText
+  +String* userNameInvalidText
+  +String* emailUsedText
+  +String* emailInvalidText
+  +String* lastErrorCode
+  -AuthService* _auth
+  -TextEditingController* _userNameController
+  -TextEditingController* _emailController
+  -TextEditingController* _pwdController
+  -GlobalKey<FormFieldState<dynamic>*>* _emailFieldKey
+  +TextEditingController* userNameController
+  +GlobalKey<FormFieldState<dynamic>*>* emailFieldKey
+  +TextEditingController* pwdController
+  +TextEditingController* emailController
+  +Future<User*>* register()
+  +bool* isPasswordStrong()
+  +String* validatePassword()
+  +bool* isUsernameValid()
+  +String* validateUsername()
+  +String* getEmailErrorText()
+  +void onSignUpPressed()
+}
+
+"pine_apple::controller::register_page_controller.dart::RegisterPageController" o-- "pine_apple::model::auth_service.dart::AuthService*"
+"pine_apple::controller::register_page_controller.dart::RegisterPageController" o-- "flutter::src::widgets::editable_text.dart::TextEditingController*"
+"pine_apple::controller::register_page_controller.dart::RegisterPageController" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>*>*"
+
+class "pine_apple::login.dart::PineAppleLogIn" {
+  +_PineAppleLogInState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::login.dart::PineAppleLogIn"
+
+class "pine_apple::login.dart::_PineAppleLogInState" {
+  -AuthService* _account
+  +TextEditingController* emailTextController
+  +TextEditingController* pwdTextController
+  +Widget* build()
+  +Widget* logInEntry()
+  +Widget* logInButton()
+  -void _signUpCallback()
+  -void _logInCallback()
+  -void _enterApp()
+  -void _forgotPasswordCallback()
+}
+
+"pine_apple::login.dart::_PineAppleLogInState" o-- "pine_apple::model::auth_service.dart::AuthService*"
+"pine_apple::login.dart::_PineAppleLogInState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::login.dart::_PineAppleLogInState"
+
+class "pine_apple::main.dart::PineApple" {
+  +_PineAppleState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::main.dart::PineApple"
+
+class "pine_apple::main.dart::_PineAppleState" {
+  -AuthService* _authController
+  -ProfilesRepository* _profilesController
+  +Widget* build()
+}
+
+"pine_apple::main.dart::_PineAppleState" o-- "pine_apple::model::auth_service.dart::AuthService*"
+"pine_apple::main.dart::_PineAppleState" o-- "pine_apple::model::profiles_repository.dart::ProfilesRepository*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::main.dart::_PineAppleState"
+
+class "pine_apple::MessageEntry.dart::MessageEntryBar" {
+  +dynamic Function(String*)* onSend
+  +_MessageEntryBarState* createState()
+}
+
+"pine_apple::MessageEntry.dart::MessageEntryBar" o-- "null::dynamic Function(String*)*"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::MessageEntry.dart::MessageEntryBar"
+
+class "pine_apple::MessageEntry.dart::_MessageEntryBarState" {
+  -TextEditingController* _textEditingController
+  -ImagePicker* _picker
+  +Widget* build()
+  -void _onAttachButton()
+  -void _onSendButton()
+}
+
+"pine_apple::MessageEntry.dart::_MessageEntryBarState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController*"
+"pine_apple::MessageEntry.dart::_MessageEntryBarState" o-- "image_picker::image_picker.dart::ImagePicker*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::MessageEntry.dart::_MessageEntryBarState"
+
+class "pine_apple::model::auth_service.dart::AuthService" {
+  -FirebaseAuth* _auth
+  +User* currentUser
+  +String* currentUserUid
+  +Stream<dynamic>* userAuthState
+  +Future<User*>* signIn()
+  +Future<User*>* register()
+  +void delete()
+  +Future<void>* signOut()
+}
+
+"pine_apple::model::auth_service.dart::AuthService" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth*"
+"pine_apple::model::auth_service.dart::AuthService" o-- "firebase_auth::firebase_auth.dart::User*"
+"pine_apple::model::auth_service.dart::AuthService" o-- "dart::async::Stream<dynamic>*"
+
+class "pine_apple::model::chat_repository.dart::ChatRepository" {
+  -DatabaseReference* _chatsReference
+  +Future<String*>* createChatGroup()
+  +ChatSessionReference* getChat()
+}
+
+"pine_apple::model::chat_repository.dart::ChatRepository" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+
+class "pine_apple::model::chat_repository.dart::ChatSessionReference" {
+  -DatabaseReference* _chatGroupReference
+  -DatabaseReference* _messagesRef
+  -FirebaseList* _fbl
+  -List<ChatMessage*>* _messageList
+  -StreamController<List<ChatMessage*>*>* _messageStream
+  +Stream<List<ChatMessage*>*>* stream
+  -void _setChatGroup()
+  +void addMessage()
+  +void dispose()
+}
+
+"pine_apple::model::chat_repository.dart::ChatSessionReference" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+"pine_apple::model::chat_repository.dart::ChatSessionReference" o-- "firebase_database::ui::firebase_list.dart::FirebaseList*"
+"pine_apple::model::chat_repository.dart::ChatSessionReference" o-- "dart::async::StreamController<List<ChatMessage*>*>*"
+"pine_apple::model::chat_repository.dart::ChatSessionReference" o-- "dart::async::Stream<List<ChatMessage*>*>*"
+
+class "pine_apple::model::profiles_repository.dart::ProfilesRepository" {
+  -DatabaseReference* _databaseReference
+  +Future<UserProfile*>* getUserProfile()
+  +Future<UserProfileReference*>* getProfileReference()
+  +Future<void>* updateProfile()
+  +Future<void>* deleteProfile()
+}
+
+"pine_apple::model::profiles_repository.dart::ProfilesRepository" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+
+class "pine_apple::model::profiles_repository.dart::UserProfileReference" {
+  -DatabaseReference* _profileReference
+  -StreamController<UserProfile*>* _profileStream
+  -String* _uid
+  -UserProfile* _userProfile
+  +Stream<UserProfile*>* profileStream
+  +UserProfile* currentUserProfile
+  {static} +Future<UserProfileReference*>* create()
+  -Future<void>* _init()
+  +Future<void>* updateProfile()
+  +Future<void>* deleteProfile()
+  +Future<UserProfile*>* snapshot()
+}
+
+"pine_apple::model::profiles_repository.dart::UserProfileReference" o-- "firebase_database::firebase_database.dart::DatabaseReference*"
+"pine_apple::model::profiles_repository.dart::UserProfileReference" o-- "dart::async::StreamController<UserProfile*>*"
+"pine_apple::model::profiles_repository.dart::UserProfileReference" o-- "pine_apple::model.dart::UserProfile*"
+"pine_apple::model::profiles_repository.dart::UserProfileReference" o-- "dart::async::Stream<UserProfile*>*"
+
+class "pine_apple::model.dart::InterestGroup" {
+  -String* _name
+  -List<String*>* _interests
+  -List<String*>* _members
+  -String* _uid
+  +String* name
+  +UnmodifiableListView<String*>* interests
+  +UnmodifiableListView<String*>* members
+  +String* uid
+}
+
+"pine_apple::model.dart::InterestGroup" o-- "dart::collection::UnmodifiableListView<String*>*"
+
+class "pine_apple::model.dart::GroupChat" {
+  +String* uid
+  +List<ChatMessage*>* messages
+  +List<String*>* messageUid
+  +UnmodifiableListView<ChatMessage*>* getMessages
+}
+
+"pine_apple::model.dart::GroupChat" o-- "dart::collection::UnmodifiableListView<ChatMessage*>*"
+
+class "pine_apple::model.dart::ChatMessage" {
+  +String* sender
+  +String* text
+  +int* timestamp
+  +String* username
+  +String* timeStampString
+  +Map<dynamic, dynamic>* map
+}
+
+class "pine_apple::model.dart::PineAppleUser" {
+  +String* uid
+  +String* email
+  +String* userName
+  +String* iconURL
+  -User* _user
+}
+
+"pine_apple::model.dart::PineAppleUser" o-- "firebase_auth::firebase_auth.dart::User*"
+
+class "pine_apple::model.dart::UserProfile" {
+  +List<String*>* joinedGroups
+  +String* description
+  +String* username
+  +String* photoURL
+  +String* uid
+  +Map<String*, dynamic>* map
+}
+
+class "pine_apple::pages::events_page.dart::EventsPage" {
+  +_EventsPageState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::pages::events_page.dart::EventsPage"
+
+class "pine_apple::pages::events_page.dart::_EventsPageState" {
+  +Widget* build()
+  +Widget* getBody()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::pages::events_page.dart::_EventsPageState"
+
+class "pine_apple::pages::login_page.dart::LoginPage" {
+  +_LoginPageState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::pages::login_page.dart::LoginPage"
+
+class "pine_apple::pages::login_page.dart::_LoginPageState" {
+  -bool* _isObscure
+  -LoginPageController* _loginController
+  +void initState()
+  +Widget* build()
+}
+
+"pine_apple::pages::login_page.dart::_LoginPageState" o-- "pine_apple::controller::login_page_controller.dart::LoginPageController*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::pages::login_page.dart::_LoginPageState"
+
+class "pine_apple::pages::register_page.dart::RegisterPage" {
+  +_RegisterPageState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::pages::register_page.dart::RegisterPage"
+
+class "pine_apple::pages::register_page.dart::_RegisterPageState" {
+  -bool* _isObscure
+  -RegisterPageController* _registerController
+  -GlobalKey<FormFieldState<dynamic>*>* _emailFieldKey
+  +Widget* build()
+}
+
+"pine_apple::pages::register_page.dart::_RegisterPageState" o-- "pine_apple::controller::register_page_controller.dart::RegisterPageController*"
+"pine_apple::pages::register_page.dart::_RegisterPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormFieldState<dynamic>*>*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::pages::register_page.dart::_RegisterPageState"
+
+class "pine_apple::pages::root.dart::Root" {
+  +_RootState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::pages::root.dart::Root"
+
+class "pine_apple::pages::root.dart::_RootState" {
+  +int* pageIndex
+  +Widget* build()
+  +Widget* getBody()
+  +Widget* getAppBar()
+  +Widget* getFooter()
+  +dynamic selectedTab()
+  +Widget* buildAppBar()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::pages::root.dart::_RootState"
+
+class "pine_apple::pages::select_interests.dart::SelectInterests" {
+  +_SelectInterestsState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::pages::select_interests.dart::SelectInterests"
+
+class "pine_apple::pages::select_interests.dart::_SelectInterestsState" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::pages::select_interests.dart::_SelectInterestsState"
+
+class "pine_apple::profile.dart::Profile" {
+  +String* uid
+  +_ProfileState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::profile.dart::Profile"
+
+class "pine_apple::profile.dart::_ProfileState" {
+  +TextEditingController* userNameController
+  +TextEditingController* bioController
+  -UserProfileReference* _profilesController
+  +UserProfile* profile
+  +void initState()
+  +Widget* build()
+  -void _confirmProfile()
+}
+
+"pine_apple::profile.dart::_ProfileState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController*"
+"pine_apple::profile.dart::_ProfileState" o-- "pine_apple::model::profiles_repository.dart::UserProfileReference*"
+"pine_apple::profile.dart::_ProfileState" o-- "pine_apple::model.dart::UserProfile*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::profile.dart::_ProfileState"
+
+class "pine_apple::StreamChatMessageList.dart::StreamChatMessageList" {
+  +Stream<List<ChatMessage*>*>* stream
+  +User* currentUser
+  +_StreamChatMessageListState* createState()
+}
+
+"pine_apple::StreamChatMessageList.dart::StreamChatMessageList" o-- "dart::async::Stream<List<ChatMessage*>*>*"
+"pine_apple::StreamChatMessageList.dart::StreamChatMessageList" o-- "firebase_auth::firebase_auth.dart::User*"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::StreamChatMessageList.dart::StreamChatMessageList"
+
+class "pine_apple::StreamChatMessageList.dart::_StreamChatMessageListState" {
+  -ScrollController* _scrollController
+  +Widget* build()
+}
+
+"pine_apple::StreamChatMessageList.dart::_StreamChatMessageListState" o-- "flutter::src::widgets::scroll_controller.dart::ScrollController*"
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::StreamChatMessageList.dart::_StreamChatMessageListState"
+
+class "pine_apple::StreamChatMessageList.dart::ChatBubble" {
+  -ChatMessage* _cm
+  +String* userId
+  +_ChatBubbleState* createState()
+}
+
+"pine_apple::StreamChatMessageList.dart::ChatBubble" o-- "pine_apple::model.dart::ChatMessage*"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::StreamChatMessageList.dart::ChatBubble"
+
+class "pine_apple::StreamChatMessageList.dart::_ChatBubbleState" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::StreamChatMessageList.dart::_ChatBubbleState"
+
+class "pine_apple::views::category_selection_page.dart::CategorySelection" {
+  +_CategorySelectionState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::category_selection_page.dart::CategorySelection"
+
+class "pine_apple::views::category_selection_page.dart::_CategorySelectionState" {
+  +Widget* build()
+  +Widget* getBody()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::category_selection_page.dart::_CategorySelectionState"
+
+class "pine_apple::views::category_selection_page.dart::FilterChipWidget" {
+  +String* chipName
+  +_FilterChipWidgetState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::category_selection_page.dart::FilterChipWidget"
+
+class "pine_apple::views::category_selection_page.dart::_FilterChipWidgetState" {
+  -bool* _isSelected
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::category_selection_page.dart::_FilterChipWidgetState"
+
+class "pine_apple::views::display_event_page.dart::DisplayEvent" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pine_apple::views::display_event_page.dart::DisplayEvent"
+
+class "pine_apple::views::events_page.dart::EventsPage" {
+  +_EventsPageState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::events_page.dart::EventsPage"
+
+class "pine_apple::views::events_page.dart::_EventsPageState" {
+  +Widget* build()
+  +Widget* getBody()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::events_page.dart::_EventsPageState"
+
+class "pine_apple::views::events_page.dart::RecommendedEvents" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pine_apple::views::events_page.dart::RecommendedEvents"
+
+class "pine_apple::views::events_page.dart::SelectedEvents" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pine_apple::views::events_page.dart::SelectedEvents"
+
+class "pine_apple::views::login_home_page.dart::LoginPage" {
+  +_LoginPageState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::login_home_page.dart::LoginPage"
+
+class "pine_apple::views::login_home_page.dart::_LoginPageState" {
+  -bool* _isObscure
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::login_home_page.dart::_LoginPageState"
+
+class "pine_apple::views::profile.dart::ProfileApp" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pine_apple::views::profile.dart::ProfileApp"
+
+class "pine_apple::views::register_page.dart::RegisterPage" {
+  +_RegisterPageState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::register_page.dart::RegisterPage"
+
+class "pine_apple::views::register_page.dart::_RegisterPageState" {
+  -bool* _isObscure
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::register_page.dart::_RegisterPageState"
+
+class "pine_apple::views::root.dart::Root" {
+  +_RootState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::root.dart::Root"
+
+class "pine_apple::views::root.dart::_RootState" {
+  +int* pageIndex
+  +Widget* build()
+  +Widget* getBody()
+  +Widget* getAppBar()
+  +Widget* getFooter()
+  +dynamic selectedTab()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::root.dart::_RootState"
+
+class "pine_apple::views::search_event.dart::SearchEvent" {
+  +_SearchEventState* createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pine_apple::views::search_event.dart::SearchEvent"
+
+class "pine_apple::views::search_event.dart::_SearchEventState" {
+  +Widget* build()
+  +Widget* getBody()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "pine_apple::views::search_event.dart::_SearchEventState"
+
+class "pine_apple::views::setting_page.dart::SettingPage" {
+  +Widget* build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pine_apple::views::setting_page.dart::SettingPage"
+
+
+@enduml

@@ -1,25 +1,21 @@
-import 'dart:async';
 import 'dart:developer';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:pine_apple/controller.dart';
-import 'package:pine_apple/MessageEntry.dart';
-import 'StreamChatMessageList.dart';
-import 'model.dart';
-import 'controller.dart';
+import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/backend.dart';
+import 'package:pine_apple/StreamChatMessageList.dart';
+import 'file:///D:/AndroidProjects/pine_apple/lib/screen/message_entry_bar.dart';
 
 class PineAppleChat extends StatefulWidget {
 
-  InterestGroup group = InterestGroup("basketball", ["basketball"], ["Me"], "basketball");
-  UserController _userController;
+  String chatId;
+  String userId;
 
-  PineAppleChat() {
+  PineAppleChat(this.chatId, this.userId) {
     log("Calling chat constructor!");
-    log("Using chat as: ${Get.find<AccountController>().currentUser.uid}");
-    _userController = Get.find(tag: "UserController");
+    log("Using chat as: $userId");
   }
 
   @override
@@ -28,12 +24,14 @@ class PineAppleChat extends StatefulWidget {
 
 class _PineAppleChatState extends State<PineAppleChat> {
   TextEditingController messageTextController = new TextEditingController();
-  ChatController chatController;
+  ChatMessagesReference chatController;
+  ProfilesRepository _userController;
+
 
   @override
   void initState() {
-    chatController = ChatController(groupUid: widget.group.name);
-
+    chatController = ChatMessagesReference(widget.chatId);
+    _userController = Get.find();
     super.initState();
   }
 
@@ -91,7 +89,7 @@ class _PineAppleChatState extends State<PineAppleChat> {
             IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: (){
-                  Get.find<AccountController>(tag: "AccountController").signOut();
+                  Get.find<AuthService>(tag: "AccountController").signOut();
                   Get.back();
                 },
                 color: ThemeData.light().buttonColor),
@@ -108,7 +106,7 @@ class _PineAppleChatState extends State<PineAppleChat> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  widget.group.name,
+                  widget.chatId,
                   style: new TextStyle(
                       fontSize: 20,
                       color: Colors.white,
@@ -161,10 +159,10 @@ class _PineAppleChatState extends State<PineAppleChat> {
 
   void createAndUploadMessage(chatMessage) {
     ChatMessage cm = ChatMessage(
-        Get.find<AccountController>().currentUser.uid,
-        chatMessage,
-        DateTime.now().millisecondsSinceEpoch,
-        username:Get.find<UserController>(tag: "UserController").currentUserProfile.username);
+        senderUid: widget.userId,
+        text: chatMessage,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        senderName:Get.find<UserProfileReference>(tag: "UserProfileController").currentUserProfile.username);
     log("Sending this data: "+cm.map.toString());
     messageTextController.clear();
     chatController.addMessage(cm);

@@ -1,14 +1,31 @@
 import 'package:flutter/material.dart';
-import 'select_interests.dart';
+import 'package:get/get.dart';
+import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pine_apple/controller/register_page_controller.dart';
+import 'package:pine_apple/screen/screen.dart';
 
 
-class RegisterPage extends StatefulWidget {
+class RegisterScreen extends StatefulWidget {
+
+  final RegisterController controller = RegisterController(PineAppleContext.auth);
+  RegisterScreen();
+
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterScreenState extends State<RegisterScreen> {
   bool _isObscure = true;
+  RegisterController _registerController;
+  final GlobalKey<FormFieldState> _emailFieldKey = GlobalKey<FormFieldState>();
+
+  @override
+  void initState() {
+    _registerController = widget.controller;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     //Size size = MediaQuery.of(context).size;
@@ -49,21 +66,21 @@ class _RegisterPageState extends State<RegisterPage> {
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.symmetric(horizontal: 50),
-                child: TextField(
-                  decoration: InputDecoration(
-                    labelText: "Username"
-                  ),
-                ),
+                child: TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: _registerController.userNameController,
+                  decoration: InputDecoration(labelText: "Username"),
+              )
               ),
 
 //Input Email function
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.symmetric(horizontal: 50),
-                child: TextField(
-                  decoration: InputDecoration(
-                      labelText: "Email"
-                  ),
+                child: TextFormField(
+                  key: _registerController.emailFieldKey,
+                  controller: _registerController.emailController,
+                  decoration: InputDecoration(labelText: "Email"),
                 ),
               ),
 
@@ -71,12 +88,15 @@ class _RegisterPageState extends State<RegisterPage> {
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.symmetric(horizontal: 50),
-                child: TextField(
+                child: TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: _registerController.pwdController,
                   obscureText: _isObscure,
                   decoration: InputDecoration(
                     labelText: "Password",
                     suffixIcon: IconButton(
-                      icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
+                      icon: Icon(
+                          _isObscure ? Icons.visibility : Icons.visibility_off),
                       onPressed: () {
                         setState(() {
                           _isObscure = !_isObscure;
@@ -87,14 +107,37 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
 
+              Container(
+                alignment: Alignment.center,
+                width: 300,
+                child: StreamBuilder(
+                    stream: _registerController.errorStream,
+                    builder: (context, snapshot){
+                      if(snapshot.hasData)
+                      {
+                        return Text(
+                          snapshot.data,
+                          style: TextStyle(
+                          color: Colors.red,
+                        ),
+                        );
+                      }
+                      else{
+                        return Text("");
+                      }
+                    }),
+              ),
+
 //Signup Button
               Container(
                 margin: EdgeInsets.only(left: 150.0, top: 120.0, right: 50.0, bottom: 50.0),
                 child: ConstrainedBox(
                   constraints: BoxConstraints.tightFor(width: 200, height: 50),
                   child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SelectInterests() ));
+                  onPressed: ()async{
+                    User user = await _registerController.onSignUpPressed();
+                    if(user!=null)
+                      Get.offNamed(Routes.NEW_USER_EDIT_PROFILE);
                   },
                     child: Text(
                       "SIGN UP",
