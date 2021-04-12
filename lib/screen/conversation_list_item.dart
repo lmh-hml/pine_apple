@@ -1,12 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/backend.dart';
 import 'chat_screen.dart';
 import 'package:get/get.dart';
 
 class ConversationListItem extends StatefulWidget {
-  GroupChatInfo groupInfo;
-  Function(GroupChatInfo) onTap;
+  final GroupChatInfo groupInfo;
+  final Function(GroupChatInfo) onTap;
 
   ConversationListItem(
       {@required this.groupInfo,
@@ -17,6 +19,7 @@ class ConversationListItem extends StatefulWidget {
 }
 
 class _ConversationListItemState extends State<ConversationListItem> {
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -33,7 +36,9 @@ class _ConversationListItemState extends State<ConversationListItem> {
                   CircleAvatar(
                     //backgroundImage: NetworkImage(widget.imageUrl),
                     maxRadius: 30,
-                    child: Icon(Icons.person, color: Colors.white,size: 40,),
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.white,size: 40,),
                     backgroundColor: Colors.redAccent,
                   ),
                   SizedBox(
@@ -79,4 +84,6 @@ class _ConversationListItemState extends State<ConversationListItem> {
       ),
     );
   }
+
+
 }

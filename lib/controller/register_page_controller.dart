@@ -81,6 +81,7 @@ class RegisterController {
         errorText = "Email is already in use";
         break;
       case 'invalid-email':
+        _emailFieldKey.currentState.validate();
         errorText = "Email is not valid";
         break;
     }
@@ -101,9 +102,7 @@ class RegisterController {
     }on FirebaseAuthException catch (e) {
       lastErrorCode = e.code;
       log(lastErrorCode);
-
       _errorStream.add(_processErrors());
-      _emailFieldKey.currentState.validate();
 
       return null;
     }
@@ -123,12 +122,6 @@ class RegisterController {
     if(usernameError!=null)return usernameError;
     else if(emailError!=null)return emailError;
     else if(pwdError!=null)return pwdError;
-
-    if(lastErrorCode == 'invalid-email')
-    {
-      _emailFieldKey.currentState.validate();
-      return('Entered email is invalid');
-    }
 
     else return '';
   }

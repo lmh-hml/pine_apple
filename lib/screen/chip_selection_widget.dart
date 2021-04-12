@@ -75,7 +75,6 @@ class EditCategorySelectionController
   void addSelection(String categoryName)
   {
     selectedCategories.add(categoryName);
-    print(selectedCategories.toString());
   }
 
   void removeSelection(String categoryName)
@@ -86,7 +85,6 @@ class EditCategorySelectionController
   Future<void> saveSelection() async
   {
     await profileReference.updateCategories(selectedCategories.toList());
-    print("Updating database ${profileReference.currentUserProfile.uid}");
   }
 
   bool isSelected(String category)

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import "package:pine_apple/screen/main_screen.dart";
+import 'package:pine_apple/screen/screen.dart';
 
 class CategorySelection extends StatefulWidget {
   @override
@@ -28,7 +29,7 @@ class _CategorySelectionState extends State<CategorySelection> {
             color: Colors.black,
             iconSize: 40.0,
             onPressed: () => {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => MainScreen() ))
+              Navigator.pushNamed(context,Routes.HOME)
             },
           ),
         ],

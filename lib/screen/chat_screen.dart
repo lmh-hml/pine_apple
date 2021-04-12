@@ -86,7 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Colors.black54,
                     onPressed: ()async {
                       await PineAppleContext.chatRepository.removeMemberFromGroup(PineAppleContext.currentUid, widget.controller.groupChatInfo.groupChatUid);
-                      Navigator.pushReplacementNamed(context, Routes.CONVERSATION_LIST);
+                      Navigator.pop(context);
                     },
                   ),
                 ],
@@ -129,8 +129,11 @@ class ChatController {
       messagesReference = ChatMessagesReference(groupChatInfo.groupChatUid),
       chatGroupReference = ChatGroupReference(groupChatInfo.groupChatUid);
 
+  ///Gets the name of the current group.
   String get groupName =>  groupChatInfo.groupChatName;
+  ///Gets the stream that fires whenever a new message is uploaded.
   Stream<List<ChatMessage>> get messageStream => messagesReference.stream;
+  ///Controller function to upload message to the database
   Future<void> uploadMessage(String text) async
   {
     return await messagesReference.addMessage(
@@ -141,6 +144,10 @@ class ChatController {
             text: text
         )
     );
+  }
+  Future<void> onRemoveUser() async
+  {
+    await PineAppleContext.chatRepository.removeMemberFromGroup(PineAppleContext.currentUid, groupChatInfo.groupChatUid);
   }
 
 

@@ -128,7 +128,6 @@ class GroupDetailsScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Container();
           List<UserProfile> list = snapshot.data;
-          print(list);
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,

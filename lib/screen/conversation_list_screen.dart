@@ -52,12 +52,11 @@ class _ChatPageState extends State<ConversationListScreen> {
             StreamBuilder<List<GroupChatInfo>>(
                 stream: widget.controller.joinedGroups,
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData || snapshot.data.length<1)
+
+                  if (!snapshot.hasData)
                     return Center(child:Text("Join a group to chat and more !"),);
 
-                  print("StreamB:${snapshot.data.toString()}");
                   List<GroupChatInfo> data = snapshot.data;
-
 
                   return ListView.builder(
                       itemCount: data.length,
@@ -70,7 +69,6 @@ class _ChatPageState extends State<ConversationListScreen> {
                           groupInfo: gci,
                           onTap: (GroupChatInfo gci)
                           {
-                            print("Tap: ${gci.groupChatUid}");
                             Get.toNamed(Routes.CHAT_SCREEN, arguments: {Routes.ARG_GROUP_CHAT_INFO:gci});
                           },
                         );
@@ -89,14 +87,14 @@ class ConversationListController
   final ChatRepository _repository = ChatRepository();
   final UserProfileReference userProfileReference;
   StreamController<List<GroupChatInfo>> _stream = BehaviorSubject();
+  List<GroupChatInfo> _chatList = [];
+
 
   ConversationListController( this.userProfileReference)
   {
     userProfileReference.getJoinedGroupsStream.listen((event) async {
-      print("Ev:$event");
-        var list = await _repository.getMultipleChatGroupInfo(event);
-        print(list);
-        _stream.add(list);
+        _chatList = await _repository.getMultipleChatGroupInfo(event);
+        _stream.add(_chatList);
     });
   }
 
@@ -108,10 +106,6 @@ class ConversationListController
     return results;
   }
 
+  ///Gets the stream that publishes user's chat list and updates whenever the user join/leaves a group
   Stream<List<GroupChatInfo>> get joinedGroups => _stream.stream;
-
-
-
-
-
 }

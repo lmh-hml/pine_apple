@@ -6,19 +6,22 @@ import 'package:pine_apple/model/UserProfile.dart';
 import 'package:pine_apple/model/profiles_repository.dart';
 import 'package:get/get.dart';
 
+
+
 class MainScreen extends StatefulWidget {
+  final List<Widget> pages;
+  MainScreen(this.pages);
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 class _MainScreenState extends State<MainScreen> {
   int pageIndex = 0;
-  List<Widget> pages = [
-    Events(),
-    ConversationListScreen(ConversationListController(PineAppleContext.currentUser)),
-    UserProfileScreen(PineAppleContext.currentUser),
-    SettingsScreen(SettingsController(Get.find())),
-  ];
-
+  List<Widget> pages;
+  @override
+  void initState() {
+    pages = widget.pages;
+    super.initState();
+  }
 
 
   @override
@@ -177,6 +180,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void selectedTab(index){
     setState(() {
+
       pageIndex = index;
     });
   }

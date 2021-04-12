@@ -39,7 +39,7 @@ class _PineAppleContextImpl
     else
     {
       _uid=null;
-      print("From context: lgout with uid $_uid");
+      print("From context: logout with uid $_uid");
     }
   }
 
@@ -54,7 +54,10 @@ class _PineAppleContextImpl
   AuthService _authService = Get.put(AuthService());
   AuthService get auth => Get.find();
 
-  UserProfileReference get currentUser => _uid!=null ? UserProfileReference(_uid) : null;
+  UserProfileReference get currentUser{
+    print("PINEAPPLE CONTEXT ID: $_uid");
+    return _uid!=null ? UserProfileReference(_uid) : null;
+  }
   UserProfile get currentUserprofile => _profile;
 }
 

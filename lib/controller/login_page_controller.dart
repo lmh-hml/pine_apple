@@ -20,11 +20,9 @@ class LoginPageController
           password: password);
 
       if(user!=null)Get.offNamed(Routes.MAIN_SCREEN);
-      print(user.uid);
 
     }on FirebaseAuthException catch(e)
     {
-      print(e.code);
       if(email == '' || password == '')_errorStream.add('Please enter a username and password.');
       switch(e.code)
       {

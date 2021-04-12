@@ -144,7 +144,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       barrierDismissible: false,
     );
     if (bioValid)
-      print(widget._newUser);
       if(!widget._newUser)Navigator.pop(context);
       else Navigator.pushReplacementNamed(context, Routes.MAIN_SCREEN);
   }

@@ -1,3 +1,5 @@
+import 'package:pine_apple/model/event_model.dart';
+
 import '../import_firebase.dart';
 import 'backend.dart';
 import 'package:rxdart/rxdart.dart';
@@ -8,6 +10,10 @@ const String _GROUPS = "groups";
 const String _USER_GROUPS = "user_groups";
 const String _GROUP_MEMBERS = "members";
 const String _ONE_TO_ONE_GROUPS = "one_to_one_groups";
+const String _EVENT_GROUPS = 'events_groups';
+const String _CHAT_TYPE_EVENT = 'chat_type_event';
+
+enum ChatType {GENERAL, EVENT, ONE_TO_ONE}
 
 ///Repository for chat related data.
 class ChatRepository {
@@ -17,13 +23,13 @@ class ChatRepository {
   ///Reference to the section of firebase database that contains all chat groups
   final DatabaseReference _groupsReference = FirebaseDatabase.instance.reference().child(_GROUPS);
   final DatabaseReference _oneToOneReference = FirebaseDatabase.instance.reference().child(_ONE_TO_ONE_GROUPS);
-  final DatabaseReference _userGroupsReference = FirebaseDatabase.instance.reference().child(_USER_GROUPS);
+  final DatabaseReference _eventGroupsReference = FirebaseDatabase.instance.reference().child(_EVENT_GROUPS);
   final DatabaseReference  _usersReference = FirebaseDatabase.instance.reference().child("users");
 
   ///Creates a chat with only two members and returns the group chat information of the created chat group.
   Future<GroupChatInfo> createOneToOneChat(String groupName, String firstMember, String secondMember) async
   {
-    GroupChatInfo gc = await createChatGroup(groupName, [firstMember,secondMember], GroupChatInfo.CHAT_TYPE_ONE_TO_ONE);
+    GroupChatInfo gc = await createChatGroup(groupName,  ChatType.ONE_TO_ONE,[firstMember,secondMember],);
     await _oneToOneReference.child(firstMember).update({secondMember:gc.groupChatUid});
     await _oneToOneReference.child(secondMember).update({firstMember:gc.groupChatUid});
     return gc;
@@ -34,25 +40,46 @@ class ChatRepository {
   {
     GroupChatInfo groupChatInfo;
     DataSnapshot snapshot = await _oneToOneReference.child(user1).child(user2).once();
-    print(snapshot.value);
       if( snapshot.value != null )
         {
           groupChatInfo = await getChatGroupInfo(snapshot.value);
-          print(groupChatInfo.toMap().toString());
           return groupChatInfo;
         }
     return groupChatInfo;
   }
 
+  ///Creates a new event group chat with initial members.
+  ///This function does NOT check if a group chat associated with the event already exists.
+  Future<GroupChatInfo> createEventGroupChatInfo(EventModel eventModel, List<String> members) async
+  {
+    GroupChatInfo groupChatInfo = await createChatGroup(eventModel.title, ChatType.EVENT,members,  eventModel.toMap());
+    assert(groupChatInfo!=null);
+    await _eventGroupsReference.update({eventModel.id:groupChatInfo.groupChatUid});
+    return groupChatInfo;
+  }
+
+  ///Gets the chat group info of the event with the specified id of the event, NOT the id of the chat group.
+  Future<GroupChatInfo> getEventGroupChatInfo(String eventId) async
+  {
+    GroupChatInfo groupChatInfo;
+    DataSnapshot snapshot = await _eventGroupsReference.child(eventId).once();
+    if(snapshot.value==null)return null;
+    else
+      {
+        groupChatInfo = await getChatGroupInfo(snapshot.value);
+        return groupChatInfo;
+      }
+  }
+
   ///Creates a general group chat with populated by its admins, and returns the group chat information of the created chat group.
-  Future<GroupChatInfo> createChatGroup(String groupName,  [List<String> members, String type]) async
+  Future<GroupChatInfo> createChatGroup(String groupName,  ChatType type,[List<String> members, Map typeDetails]) async
   {
     String uid = await _groupsReference.push().key;
-    GroupChatInfo gc = GroupChatInfo(uid, groupName, membersId:  members??[], adminsUid: [], type: type);
+    GroupChatInfo gc = GroupChatInfo(uid, groupName, membersId:  members??[], adminsUid: [], type: type,details: typeDetails);
     await _groupsReference.update({uid:gc.toMap()});
     for(String id in members)
       {
-        await addMemberToGroup(id, uid);
+        await addMemberToGroup(id, uid,type:  type);
       }
     return gc;
   }
@@ -85,18 +112,21 @@ class ChatRepository {
     return results;
   }
 
+
   ///Adds a user to a group using their uids.
-  Future<void> addMemberToGroup(String userUid ,String groupId)async
+  Future<void> addMemberToGroup(String userUid ,String groupId,{ChatType type})async
   {
-      await _groupsReference.child(groupId).child(_GROUP_MEMBERS).update({userUid:1});
-      await _usersReference.child(userUid).child(_GROUPS).update({groupId:1});
+      ChatType chatType = type ?? ChatType.GENERAL;
+      await _groupsReference.child(groupId).child(_GROUP_MEMBERS).update({userUid:chatType.index});
+      await _usersReference.child(userUid).child(_GROUPS).update({groupId:chatType.index});
   }
 
   ///Removes a member from a group using their uids.
   Future<void> removeMemberFromGroup(String userUid, String groupId) async
   {
-    await _groupsReference.child(groupId).child(_GROUP_MEMBERS).child(userUid).update(null);
-    await _usersReference.child(userUid).child(_GROUPS).child(groupId).update(null);
+    await _groupsReference.child(groupId).child(_GROUP_MEMBERS).child(userUid).remove();
+    print("REMOVING USER $userUid from $groupId");
+    await _usersReference.child(userUid).child(_GROUPS).child(groupId).remove();
   }
 
   ///Gets a list of members of the group.
@@ -192,7 +222,7 @@ class ChatGroupReference
   }
 
   ///Adds a user into a group using their uids.
-  Future<void> addMember(String userUid ,[bool admin])async
+  Future<void> addMember(String userUid )async
   {
     _repository.addMemberToGroup(userUid, uid);
   }

@@ -18,7 +18,6 @@ class AuthService {
   ///If unsuccessful, function returns null.
   Future<User> signIn(
       {@required String email, @required String password}) async {
-      print(email);
       UserCredential userCred = await _auth.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
       return userCred.user;

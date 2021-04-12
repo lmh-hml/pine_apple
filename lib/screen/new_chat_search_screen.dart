@@ -8,17 +8,13 @@ import 'package:rxdart/rxdart.dart';
 import 'package:pine_apple/screen/screen.dart';
 
 class NewChatSearchScreen extends StatefulWidget{
-
-
   @override
   _NewChatSearchScreenState createState() => _NewChatSearchScreenState();
 }
 
 class _NewChatSearchScreenState extends State<NewChatSearchScreen> {
-  @override
 
   final SearchNewChatScreenController controller = SearchNewChatScreenController();
-
 
   Widget build(BuildContext context){
     return Scaffold(
@@ -65,7 +61,6 @@ class _NewChatSearchScreenState extends State<NewChatSearchScreen> {
                   return Center(child:Text("Enter a username to search"));
                 List<UserProfile> list = snapshot.data;
                 if(list.isEmpty)return Center(child: Text("Unable to find user with username"),);
-                print("ChatSearchScreen:${list.length}");
                 return ListView.builder(
                   shrinkWrap: true,
                     itemCount: list.length,
@@ -156,11 +151,7 @@ class SearchNewChatScreenController
 
   }
 
-  Future<GroupChatInfo> createChat(List<String> members) async
-  {
-    return await _chatRepository.createChatGroup("Chat", members);
-  }
-
+  ///Stream the UI subscribes to receive results from the search.
   Stream<List<UserProfile>> get searchResultsStream => _resultsStream.stream;
 
 }

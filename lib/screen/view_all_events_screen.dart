@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:pine_apple/model/event_model.dart';
+import 'package:pine_apple/model/events_repository.dart';
 import 'event_detail_screen.dart';
+import 'event_list_widget.dart';
 import 'screen.dart';
 import 'package:pine_apple/data/events_json.dart';
 
 class ViewAllEvents extends StatelessWidget {
+
+  final EventsRepository eventsRepository = EventsRepository();
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,19 +43,37 @@ class ViewAllEvents extends StatelessWidget {
 
   Widget getBody(){
     return SingleChildScrollView(
-      child: Column(
-        children: List.generate(events.length, (index){
-          return AllEvents(
-            image: events[index]['image'],
-            title: events[index]['title'],
-            description: events[index]['description'],
-            startDate: events[index]['startDate'],
-            endDate: events[index]['endDate'],
+      child: FutureBuilder(
+        future: eventsRepository.getAllRecentEvents() ,
+        builder:(context, snapshot){
+          List<EventModel> events;
+          if(!snapshot.hasData) events = [];
+          else events = snapshot.data;
+          return Column(
+            children: [
+              Container(
+                alignment: Alignment(-0.8, 1.0),
+                height: 30.0,
+                child: Text(
+                  'Recommended Events',
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    color: Colors.deepPurple,
+                    fontFamily: 'One',
+                  ),
+                ),
+              ),
+              EventListWidget(events, onItemTap: (event){
+                Navigator.pushNamed(context, Routes.EVENT_DETAIL_SCREEN_WITH_JOIN, arguments: {Routes.ARG_EVENT_MODEL:event});
+              },),
+            ],
           );
-        }),
+        }
+        ,
       ),
     );
   }
+
 }
 
 class AllEvents extends StatelessWidget {

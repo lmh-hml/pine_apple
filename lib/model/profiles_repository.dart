@@ -49,8 +49,7 @@ class ProfilesRepository {
 class UserProfileReference {
 
   final DatabaseReference _profileReference;
-  final DatabaseReference _userGroupsReference;
-  StreamController<UserProfile> _profileStreamController = BehaviorSubject();
+    StreamController<UserProfile> _profileStreamController = BehaviorSubject();
   StreamController<List<String>> _groupListStreamController = BehaviorSubject();
   String _uid;
   UserProfile _userProfile;
@@ -58,7 +57,6 @@ class UserProfileReference {
   ///Factory method for constructing this class asynchronously.
   UserProfileReference(String uid):
         _uid = uid,
-        _userGroupsReference = FirebaseDatabase.instance.reference().child("user_groups").child(uid),
         _profileReference = FirebaseDatabase.instance.reference().child("users").child(uid)
   {
      _init(uid);
@@ -80,8 +78,9 @@ class UserProfileReference {
           for(var item in event.snapshot.value.keys.toList()){
             list.add(item.toString());
           }
-          _groupListStreamController.add(list);
         }
+      for(var item in list)print(item.toString());
+      _groupListStreamController.add(list);
     });
 
   }
@@ -94,7 +93,6 @@ class UserProfileReference {
   ///Update this user's profile with the supplied list.
   Future<void> updateCategories(List<String> categories) async
   {
-    print(_uid);
     await _profileReference.update({"categories":categories});
   }
 
@@ -109,7 +107,7 @@ class UserProfileReference {
     _profileReference.update({_uid: null});
   }
 
-  ///Gets a snapshot of a list of groups that the user is in.
+  ///Gets a snapshot of a list of groups ids that the user is in.
   Future<List<String>> getJoinedGroups() async
   {
     List<String> list=[];
@@ -121,6 +119,18 @@ class UserProfileReference {
     return list;
   }
 
+  ///Returns a list of event group ids that the user has joined.
+  Future<List<String>> getJoinedEventGroups() async
+  {
+    List<String> list=[];
+    DataSnapshot snapshot = await _profileReference.child('groups').once();
+    Map map = snapshot.value as Map;
+    if(map!=null)
+      map.forEach((key, value) {
+        if(value == ChatType.EVENT.index)list.add(key);
+      });
+    return list;
+  }
 
 
   ///Returns a stream of the current user's profile data that notifies listeners whenever

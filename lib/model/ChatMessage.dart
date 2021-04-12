@@ -1,7 +1,9 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pine_apple/model/backend.dart';
 
 import '../import_firebase.dart';
+import 'event_model.dart';
 
 ///Class representing a Chat Message
 class ChatMessage {
@@ -59,8 +61,7 @@ class GroupChatInfo
   static const String ADMINS = "adminsUid";
   static const String LATEST = "latest";
   static const String CHAT_TYPE = "type";
-  static const CHAT_TYPE_GENERAL = "general";
-  static const CHAT_TYPE_ONE_TO_ONE = 'oneToOne';
+  static const String TYPE_DETAILS = "type_details";
 
   String _groupChatUid;
   String get groupChatUid => _groupChatUid;
@@ -68,17 +69,19 @@ class GroupChatInfo
   String _groupChatIcon;
   ChatMessage _latestMessage;
   Map _membersUid;
-  Map _adminsUid;
-  String _type;
+  ChatType _type;
+
+  Map _details;
 
 
-  GroupChatInfo(String groupChatUid, String groupChatName,{List<dynamic> membersId, List<dynamic>adminsUid, String type})
+
+
+  GroupChatInfo(String groupChatUid, String groupChatName,{List<dynamic> membersId, List<dynamic>adminsUid, ChatType type, Map details})
   {
     _groupChatUid = groupChatUid;
     _groupChatName = groupChatName;
     _membersUid = {};
-    _adminsUid = {};
-    _type = type ?? CHAT_TYPE_GENERAL;
+    _type = type==null ? ChatType.GENERAL:type;
     if(membersId!=null)
       {
         for(var item in membersId)
@@ -86,14 +89,7 @@ class GroupChatInfo
           _membersUid[item.toString()] = 1;
         }
       }
-
-    if(adminsUid!=null)
-      {
-        for(var item in adminsUid)
-        {
-          _adminsUid[item.toString()] = 2;
-        }
-      }
+    _details = details;
 
   }
 
@@ -103,9 +99,9 @@ class GroupChatInfo
     _groupChatName = map[GROUP_NAME]??"";
     _groupChatIcon = map[CHAT_ICON]??"";
     _membersUid = map[MEMBERS]??{};
-    _adminsUid = map[ADMINS]??{};
     _latestMessage = map[LATEST]!=null ? ChatMessage.fromMap(map[LATEST]):null;
-    _type = map[CHAT_TYPE] ?? CHAT_TYPE_GENERAL;
+    _type = map[CHAT_TYPE]!=null ? ChatType.values[map[CHAT_TYPE]] : ChatType.GENERAL;
+    _details = map['type_details'] ?? {};
   }
 
   Map toMap() {
@@ -114,9 +110,9 @@ class GroupChatInfo
       GROUP_NAME: _groupChatName,
       CHAT_ICON: _groupChatIcon,
       MEMBERS: _membersUid,
-      ADMINS: _adminsUid,
       LATEST : _latestMessage?.map,
-      CHAT_TYPE:_type
+      CHAT_TYPE:_type.index,
+      TYPE_DETAILS: _details
     };
   }
 
@@ -124,7 +120,8 @@ class GroupChatInfo
   String get groupChatIcon => _groupChatIcon;
   ChatMessage get latestMessage => _latestMessage;
   List<String> get membersUid => List<String>.from(_membersUid.keys.toList(growable: false));
-  List get adminsUid => _adminsUid.keys.toList(growable:  false);
-  String get type => _type;
+  ChatType get type => _type;
+  Map get detail => _details;
 
 }
+

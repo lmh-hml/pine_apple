@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:pine_apple/import_firebase.dart';
+import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/backend.dart';
+import 'package:pine_apple/model/event_model.dart';
+import 'package:pine_apple/screen/event_list_widget.dart';
+import 'package:pine_apple/screen/event_selected_widget.dart';
+import 'package:rxdart/rxdart.dart';
 import 'screen.dart';
 import 'package:pine_apple/data/events_json.dart';
 
 ///Screen showing the list of new events and events joined, and a search bar that users can use to search
 ///for specific events.
-class Events extends StatefulWidget {
+class EventsScreen extends StatefulWidget{
+  final EventsScreenController controller = EventsScreenController();
+
   @override
-  _EventsState createState() => _EventsState();
+  _EventsScreenState createState() => _EventsScreenState();
 }
 
-class _EventsState extends State<Events> {
+class _EventsScreenState extends State<EventsScreen> {
+
+  final EventsRepository eventsRepository = EventsRepository();
+
+
   @override
   Widget build(BuildContext context) {
     return getBody();
@@ -39,29 +53,17 @@ class _EventsState extends State<Events> {
             ),
           ),
 
-          Container(
-            alignment: Alignment(-0.8, 1.0),
-            height: 40.0,
-            child: Text(
-              'Selected Events',
-              style: TextStyle(
-                fontSize: 30.0,
-                color: Colors.deepPurple,
-                fontFamily: 'One',
-              ),
-            ),
-          ),
+          StreamBuilder(
+              stream: widget.controller.joinedEventStream,
+              builder: (context, snapshot){
+                if(snapshot.hasData)
+                  {
+                    return EventSelectedListWidget(snapshot.data);
+                  }
+                return Center(child: Text("Join an event !"));
+              }),
 
-//List of Selected Events
-          Column(
-            children: List.generate(events.length, (index){
-              return SelectedEvents(
-                title: events[index]['title'],
-                startDate: events[index]['startDate'],
-                endDate: events[index]['endDate'],
-              );
-            }),
-          ),
+
 
           Divider(
             height: 30,
@@ -69,296 +71,100 @@ class _EventsState extends State<Events> {
             indent: 15,
             endIndent: 15,
           ),
-
-          Container(
-            alignment: Alignment(-0.8, 1.0),
-            height: 30.0,
-            child: Text(
-              'Recommended Events',
-              style: TextStyle(
-                fontSize: 30.0,
-                color: Colors.deepPurple,
-                fontFamily: 'One',
-              ),
-            ),
-          ),
-
-// List of Recommended Events
-          Column(
-            children: List.generate(events.length, (index){
-              return RecommendedEvents(
-                image: events[index]['image'],
-                title: events[index]['title'],
-                description: events[index]['description'],
-                startDate: events[index]['startDate'],
-                endDate: events[index]['endDate'],
-              );
-            }),
-          ),
-        ],
+//RECOMMENDED LIST WIDGET
+          FutureBuilder(
+              future: widget.controller.getRecommendedEvents() ,
+              builder:(context, snapshot){
+                List<EventModel> events;
+                if(!snapshot.hasData) events = [];
+                else events = snapshot.data;
+                return _buildRecommendedEventList(events);
+              }
+        ,
       ),
-    );
+    ]
+    ));
   }
-}
 
-class SelectedEvents extends StatelessWidget {
-  final String title;
-  final String startDate;
-  final String endDate;
-
-  const SelectedEvents({
-    Key key, this.title, this.startDate, this.endDate,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildRecommendedEventList(List<EventModel> events)
+  {
+    //RECOMMENDED EVENT LIST
     return Column(
-      children: <Widget> [
-        InkWell(
-          onTap: () {
-            //Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetailsScreen() ));
-          }, // Handle your callback
-          child: Container(
-            height: 70.0,
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: Colors.grey,
-                ),
-                bottom: BorderSide(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  child: Column(
-                    children: <Widget> [
-                      Container(
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: RichText(
-                            text: TextSpan(
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: "Name:  ",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.black,
-                                    fontFamily: 'One',
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: title,
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Container(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: "Date:  ",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                              fontFamily: 'One',
-                            ),
-                          ),
-                          TextSpan(
-                            text: startDate,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text: " - ",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text: endDate,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+      children: [
+        Container(
+          alignment: Alignment(-0.8, 1.0),
+          height: 30.0,
+          child: Text(
+            'Recommended Events',
+            style: TextStyle(
+              fontSize: 30.0,
+              color: Colors.deepPurple,
+              fontFamily: 'One',
             ),
           ),
         ),
+        EventListWidget(events, onItemTap: (event){
+          Navigator.pushNamed(context, Routes.EVENT_DETAIL_SCREEN_WITH_JOIN, arguments: {Routes.ARG_EVENT_MODEL:event});
+        },),
       ],
     );
   }
+
 }
 
-class RecommendedEvents extends StatelessWidget {
-  final String title;
-  final String image;
-  final String description;
-  final String startDate;
-  final String endDate;
+class EventsScreenController
+{
+  EventsRepository _eventsRepository = EventsRepository();
+  UserProfileReference userProfileReference;
+  StreamController<List<GroupChatInfo>> _stream = BehaviorSubject();
 
-  const RecommendedEvents({
-    Key key, this.title, this.image, this.description, this.startDate, this.endDate,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget> [
-        InkWell(
-          onTap: () => {
-            //Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetailsScreen() ))
-          }, // Handle your callback
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            child: Column(
-              children: <Widget> [
-                Container(
-                  height: 250.0,
-                  child: Image(
-                    image: NetworkImage(image),
-                  ),
-                ),
-
-                Container(
-                  padding: EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: "Name:  ",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                              fontFamily: 'One',
-                            ),
-                          ),
-                          TextSpan(
-                            text: title,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-
-                Container(
-                  padding: EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: "Description:  ",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                              fontFamily: 'One',
-                            ),
-                          ),
-                          TextSpan(
-                            text: description,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-
-                Container(
-                  padding: EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0, bottom: 10.0),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: "Date:  ",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                              fontFamily: 'One',
-                            ),
-                          ),
-                          TextSpan(
-                            text: startDate,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text: " - ",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                          TextSpan(
-                            text: endDate,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+  ///Constructor of EventScreenController
+  ///Subscribes to the user's joined groups list to update the list of event groups that the user in a member of.
+  EventsScreenController()
+  {
+    PineAppleContext.currentUser.getJoinedGroupsStream.listen((event) async{
+      print("LISTENING!!! ${event.toString()}");
+      if(event.isEmpty) {
+        _stream.add([]);
+        return;
+      }
+          List<GroupChatInfo> list = await getUserJoinedEventGroups();
+          if(list!=null) _stream.add(list);
+        });
   }
+
+  ///Get all recommended events for the user according to their categories. If they do have any category selected,
+  ///a general search for all current events is performed instead.
+  Future<List<EventModel>> getRecommendedEvents() async
+  {
+      if(PineAppleContext.currentUid==null)
+        return await _eventsRepository.getAllRecentEvents();
+      else
+        {
+          String search = '';
+          for(String category in PineAppleContext.currentUserprofile.categories)
+            {
+              search+=',$category';
+            }
+          print('Searching with:$search');
+          if(search.isBlank) return await _eventsRepository.getAllRecentEvents();
+          return await _eventsRepository.searchEventWithKeyword(search);
+        }
+  }
+
+  ///Gets a snapshot of event groups that the userhas joined.
+  Future <List<GroupChatInfo>> getUserJoinedEventGroups() async
+  {
+    List<GroupChatInfo> groupChatInfo;
+    List<String> ids = await PineAppleContext.currentUser.getJoinedEventGroups();
+    if(ids.isEmpty)return groupChatInfo;
+    groupChatInfo = await PineAppleContext.chatRepository.getMultipleChatGroupInfo(ids);
+    return groupChatInfo;
+  }
+
+  ///Stream that fires whenever a the user joins a new event group
+  Stream<List<GroupChatInfo>> get joinedEventStream => _stream.stream;
+
 }
+
+

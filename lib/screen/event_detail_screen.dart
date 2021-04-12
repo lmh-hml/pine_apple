@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/model/events_repository.dart';
+import 'package:pine_apple/model/event_model.dart';
+import 'package:pine_apple/screen/screen.dart';
 
 class EventDetailsScreen extends StatelessWidget {
 
   final EventModel event;
-  EventDetailsScreen(this.event);
+  final Function(BuildContext,EventModel) onJoinTapped;
+
+  EventDetailsScreen(this.event,{this.onJoinTapped});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(event.title,style: TextStyle(color: Colors.black, fontSize: 30),),
+        automaticallyImplyLeading: true,
+        leading: Navigator.canPop(context)?BackButton(color: Colors.black,onPressed:()=>Navigator.pop(context),):null,
+        backgroundColor: Colors.white,
+      ),
       body:
           SafeArea(
             child: SingleChildScrollView(
@@ -50,101 +63,18 @@ class EventDetailsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    _buildDetailPair('Venue: ', event.venue),
+                    _buildDetailPair('Date: ', '${event.startDate} to ${event.endDate}'),
+                    _buildDetailPair('Time: ', '${event.startTime} - ${event.endTime}'),
+                    _buildDetailPair('Categories: ', event.keywordString),
 
-                    Container(
-                      padding: EdgeInsets.only(left: 10.0, top: 20.0, right: 10.0),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: RichText(
-                          text: TextSpan(
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: "Venue Name:  ",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.black,
-                                  fontFamily: 'One',
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                              TextSpan(
-                                text: event.venue,
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: RichText(
-                          text: TextSpan(
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: "Date:  ",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.black,
-                                  fontFamily: 'One',
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '${event.startDate} to ${event.endDate}',
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: RichText(
-                          text: TextSpan(
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: "Time:  ",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.black,
-                                  fontFamily: 'One',
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "9.00am - 9.00pm",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    Container(
+                    if(onJoinTapped!=null)Container(
                       margin: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
                       width: 150.0,
                       height: 50.0,
                       child: ElevatedButton(
-                        onPressed: () => {
-                          // Navigate.push to group chat
+                        onPressed: onJoinTapped==null ? null:(){
+                          onJoinTapped(context,event);
                         },
                         child: Text(
                           "JOIN",
@@ -172,4 +102,55 @@ class EventDetailsScreen extends StatelessWidget {
           ),
     );
   }
+
+  Widget _buildDetailPair(String title, String value)
+  {
+    return Container(
+      padding: EdgeInsets.only(left: 10.0, top: 10.0, right: 10.0),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: RichText(
+          text: TextSpan(
+            children: <TextSpan>[
+              TextSpan(
+                text: title,
+                style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.black,
+                  fontFamily: 'One',
+                  letterSpacing: 1.0,
+                ),
+              ),
+              TextSpan(
+                text: value,
+                style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class EventDetailScreenController
+{
+  Future<void> onJoinTapped(BuildContext context, EventModel event) async
+  {
+    ChatRepository _chatRepository = PineAppleContext.chatRepository;
+
+    GroupChatInfo info = await _chatRepository.getEventGroupChatInfo(event.id);
+    if(info==null)
+      {
+        info = await _chatRepository.createEventGroupChatInfo(event, [PineAppleContext.currentUid]);
+      }
+    else{
+      await _chatRepository.addMemberToGroup(PineAppleContext.currentUid, info.groupChatUid, type: ChatType.EVENT);
+    }
+    Navigator.pushNamed(context, Routes.CHAT_SCREEN, arguments: { Routes.ARG_GROUP_CHAT_INFO:info});
+  }
+
 }
