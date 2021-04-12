@@ -32,6 +32,7 @@ dependencies:
   intl:
   rxdart:
   cached_network_image:
+  flutter_phoenix:
 
 
   # The following adds the Cupertino Icons font to your application.

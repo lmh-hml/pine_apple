@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:pine_apple/model/ChatMessage.dart';
 import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/StreamChatMessageList.dart';
-import 'file:///D:/AndroidProjects/pine_apple/lib/screen/message_entry_bar.dart';
+import 'package:pine_apple/screen/message_entry_bar.dart';
 
 class PineAppleChat extends StatefulWidget {
 

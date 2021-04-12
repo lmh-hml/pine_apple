@@ -25,6 +25,7 @@ import 'package:pine_apple/screen/login_screen.dart';
 import 'package:pine_apple/screen/main_screen.dart';
 import 'package:pine_apple/screen/register_screen.dart';
 import 'package:pine_apple/screen/settings_screen.dart';
+import 'package:pine_apple/screen/start_up_screen.dart';
 import 'package:pine_apple/screen/user_profile_screen.dart';
 import 'package:pine_apple/screen/group_detail_screen.dart';
 import '../import_firebase.dart';
@@ -35,17 +36,11 @@ import 'events_screen.dart';
 
 export 'package:get/get.dart';
 
-List<Widget> Pages = [
-  EventsScreen(),
-  ConversationListScreen(ConversationListController(PineAppleContext.currentUser)),
-  UserProfileScreen(PineAppleContext.currentUser),
-  SettingsScreen(SettingsController(Get.find())),
-];
 
 
 class Routes {
   Routes._();
-  static const String HOME = '/';
+  static const String START_UP = '/';
   static const String LOGIN = "/login";
   static const String REGISTER = "/register";
   static const String NEW_USER_EDIT_PROFILE = '/new_user_edit_profile';
@@ -78,7 +73,13 @@ class Routes {
 
     Map args = routeSettings.arguments as Map;
 
+
     switch (routeSettings.name) {
+
+      case START_UP:
+        {
+          return GetPageRoute(page:()=>StartUpScreen());
+        }
 
       case LOGIN:
         return GetPageRoute( page: () => LoginScreen(),);
@@ -94,8 +95,8 @@ class Routes {
         }
 
       case MAIN_SCREEN:
-      case HOME:
-        return GetPageRoute(page:()=>MainScreen(Pages));
+      case START_UP:
+        return GetPageRoute(page:()=>MainScreen());
 
       case USER_PROFILE_SCREEN:
         {

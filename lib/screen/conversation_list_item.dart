@@ -1,10 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pine_apple/model/ChatMessage.dart';
-import 'package:pine_apple/model/backend.dart';
-import 'chat_screen.dart';
-import 'package:get/get.dart';
 
 class ConversationListItem extends StatefulWidget {
   final GroupChatInfo groupInfo;
@@ -84,6 +80,4 @@ class _ConversationListItemState extends State<ConversationListItem> {
       ),
     );
   }
-
-
 }

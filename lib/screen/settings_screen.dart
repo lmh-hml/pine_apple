@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:pine_apple/model/auth_service.dart';
 import 'screen.dart';
 
@@ -15,8 +16,7 @@ class SettingsScreen extends StatelessWidget {
       body: Column(
         children: <Widget> [
           InkWell(
-            onTap: () async {
-              controller.logout();
+            onTap: () {
             },
             child: Container(
               padding: EdgeInsets.fromLTRB(30, 20, 0, 20),
@@ -84,8 +84,8 @@ class SettingsScreen extends StatelessWidget {
 
           InkWell(
           onTap: () async{
-            await controller.logout();
-            Navigator.pushNamed(context, Routes.LOGIN);
+            controller.logout(context);
+            //Navigator.pushNamed(context, Routes.LOGIN);
           },
             child: Container(
               padding: EdgeInsets.fromLTRB(30, 20, 0, 20),
@@ -117,8 +117,9 @@ class SettingsController
   AuthService authService;
   SettingsController(this.authService);
 
-  Future<void> logout() async
+  Future<void> logout(BuildContext context) async
   {
-    return authService.signOut();
+    await authService.signOut();
+    Navigator.of(context).popUntil(ModalRoute.withName(Routes.START_UP));
   }
 }

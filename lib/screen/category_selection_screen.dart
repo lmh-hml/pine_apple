@@ -29,7 +29,7 @@ class _CategorySelectionState extends State<CategorySelection> {
             color: Colors.black,
             iconSize: 40.0,
             onPressed: () => {
-              Navigator.pushNamed(context,Routes.HOME)
+              Navigator.pushNamed(context,Routes.START_UP)
             },
           ),
         ],

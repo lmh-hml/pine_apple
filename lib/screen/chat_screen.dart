@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pine_apple/StreamChatMessageList.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:pine_apple/import_firebase.dart';
 import 'package:pine_apple/model/ChatMessage.dart';
 import 'package:pine_apple/model/UserProfile.dart';
 import 'package:pine_apple/model/backend.dart';
@@ -53,11 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () {
                       Navigator.pushNamed(context, Routes.GROUP_DETAIL_SCREEN, arguments: {Routes.ARG_GROUP_CHAT_INFO:widget.controller.groupChatInfo});
                     },
-                    icon: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          "https://cdn.dribbble.com/users/673318/screenshots/13978817/media/726e5ff73caaef10c1a8a7f473547638.png?compress=1&resize=400x300"),
-                      maxRadius: 20,
-                    ),
+                    icon: Icon(Icons.info, color:Colors.grey, size: 35,),
                   ),
                   SizedBox(
                     width: 2,
@@ -66,23 +63,20 @@ class _ChatScreenState extends State<ChatScreen> {
                     width: 12,
                   ),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          widget.controller.groupName,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(
-                          height: 6,
-                        ),
-                      ],
+                    child: Text(
+                      widget.controller.groupName,
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w600),
+                      overflow: TextOverflow.fade,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
                   ),
+                  SizedBox(
+                    height: 6,
+                  ),
                   IconButton(
-                    icon: Icon(Icons.more_vert),
+                    icon: Icon(Icons.cancel,color: Colors.redAccent, size: 30,),
                     color: Colors.black54,
                     onPressed: ()async {
                       await PineAppleContext.chatRepository.removeMemberFromGroup(PineAppleContext.currentUid, widget.controller.groupChatInfo.groupChatUid);

@@ -19,7 +19,7 @@ class LoginPageController
       User user = await _auth.signIn(email: email,
           password: password);
 
-      if(user!=null)Get.offNamed(Routes.MAIN_SCREEN);
+      //if(user!=null)Get.offNamed(Routes.MAIN_SCREEN);
 
     }on FirebaseAuthException catch(e)
     {

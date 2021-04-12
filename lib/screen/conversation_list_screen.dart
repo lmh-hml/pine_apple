@@ -20,6 +20,8 @@ class ConversationListScreen extends StatefulWidget {
 
 class _ChatPageState extends State<ConversationListScreen> {
 
+  TextEditingController searchController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +33,34 @@ class _ChatPageState extends State<ConversationListScreen> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search...",
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  prefixIcon: Icon(
-                    Icons.search, color: Colors.grey.shade600, size: 20,),
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                  contentPadding: EdgeInsets.all(8),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(
-                          color: Colors.grey.shade100
-                      )
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: searchController,
+                      onSubmitted: (text)=>widget.controller.onQuery(text),
+                      decoration: InputDecoration(
+                        hintText: "Search...",
+                        hintStyle: TextStyle(color: Colors.grey.shade600),
+                        prefixIcon: Icon(
+                          Icons.search, color: Colors.grey.shade600, size: 20,),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        contentPadding: EdgeInsets.all(8),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide(
+                                color: Colors.grey.shade100
+                            )
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  IconButton(icon: Icon(Icons.cancel), onPressed: (){
+                    searchController.clear();
+                    widget.controller.onClear();
+                  })
+                ],
               ),
             ),
             StreamBuilder<List<GroupChatInfo>>(
@@ -88,13 +102,15 @@ class ConversationListController
   final UserProfileReference userProfileReference;
   StreamController<List<GroupChatInfo>> _stream = BehaviorSubject();
   List<GroupChatInfo> _chatList = [];
+  bool searching = false;
 
 
   ConversationListController( this.userProfileReference)
   {
     userProfileReference.getJoinedGroupsStream.listen((event) async {
+        print("Listening for ${userProfileReference.currentUserProfile.uid}");
         _chatList = await _repository.getMultipleChatGroupInfo(event);
-        _stream.add(_chatList);
+        if(!searching)_stream.add(_chatList);
     });
   }
 
@@ -104,6 +120,26 @@ class ConversationListController
     List<String> l = await userProfileReference.getJoinedGroups();
     List<GroupChatInfo> results = await _repository.getMultipleChatGroupInfo(l);
     return results;
+  }
+
+  Future<void> onQuery(String string)
+  {
+    searching = true;
+    List<GroupChatInfo> results = [];
+    for(GroupChatInfo info in _chatList)
+      {
+        if(info.groupChatName.contains(string))
+          {
+            results.add(info);
+          }
+      }
+    _stream.add(results);
+  }
+
+  void onClear()
+  {
+    searching = false;
+    _stream.add(_chatList);
   }
 
   ///Gets the stream that publishes user's chat list and updates whenever the user join/leaves a group

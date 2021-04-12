@@ -9,17 +9,28 @@ import 'package:get/get.dart';
 
 
 class MainScreen extends StatefulWidget {
-  final List<Widget> pages;
-  MainScreen(this.pages);
+
+  final List<Widget> Pages = [
+    EventsScreen(),
+    ConversationListScreen(ConversationListController(PineAppleContext.currentUser)),
+    UserProfileScreen(PineAppleContext.currentUser),
+    SettingsScreen(SettingsController(Get.find())),
+  ];
+
+  MainScreen();
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 class _MainScreenState extends State<MainScreen> {
+
+
+
+
   int pageIndex = 0;
   List<Widget> pages;
   @override
   void initState() {
-    pages = widget.pages;
+    pages = widget.Pages;
     super.initState();
   }
 
