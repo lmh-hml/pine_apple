@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pine_apple/controller/search_event_screen_controller.dart';
 import 'package:pine_apple/import_firebase.dart';
-import 'package:pine_apple/model/backend.dart';
 import'package:pine_apple/model/event_model.dart';
 import 'package:pine_apple/screen/screen.dart';
-import 'package:rxdart/rxdart.dart';
-
-import 'event_list_widget.dart';
-import 'event_selected_widget.dart';
+import 'widgets/event_list_widget.dart';
 
 class SearchEvent extends StatefulWidget {
   @override
@@ -99,21 +96,3 @@ class _SearchEventState extends State<SearchEvent> {
   }
 }
 
-class SearchEventScreenController
-{
-  EventsRepository _eventsRepository = EventsRepository();
-  StreamController<List<EventModel>> _resultsStream = BehaviorSubject();
-  var searching = false.obs;
-
-  ///Perform a query based on the indicated keywords
-  Future<void> doQuery(String keyword) async
-  {
-    searching.value = true;
-    List<EventModel> results =  await _eventsRepository.searchEventWithKeyword(keyword);
-    _resultsStream.add(results);
-    searching.value = false;
-  }
-
-  ///Stream that updates whenever results from doQuery() is available.
-  Stream<List<EventModel>> get resultsStream=>_resultsStream.stream;
-}

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/backend.dart';
-import 'model/chat_message_model.dart';
+import '../../model/chat_message_model.dart';
 
 
 

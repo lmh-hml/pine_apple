@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pine_apple/model/event_model.dart';
 import 'package:pine_apple/model/events_repository.dart';
 import 'event_detail_screen.dart';
-import 'event_list_widget.dart';
+import 'widgets/event_list_widget.dart';
 import 'screen.dart';
-import 'package:pine_apple/data/events_json.dart';
 
 class ViewAllEvents extends StatelessWidget {
 

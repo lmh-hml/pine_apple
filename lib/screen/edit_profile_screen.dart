@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pine_apple/controller/edit_profile_screen_controller.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
 import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/backend.dart';
@@ -149,16 +150,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 }
 
-class EditProfileController {
-  final UserProfileReference reference;
-  EditProfileController(this.reference);
 
-  Future<void> saveBio(String bio) async {
-    if (bio.length > 0)
-      return await reference.updateBio(bio);
-    else
-      return;
-  }
-
-  Future<UserProfile> get profileData async => reference.getUserProfile();
-}

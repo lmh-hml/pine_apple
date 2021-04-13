@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:pine_apple/model/event_model.dart';
 
+
+
 class EventsRepository
 {
   final String _username = 'pineapple4';
@@ -14,7 +16,6 @@ class EventsRepository
   EventsRepository(){
     _basicAuth = 'Basic ' + base64Encode(utf8.encode('$_username:$_pwd'));
   }
-
 
   ///Gets a a list of ongoing events associated with the keyword from the repository.
   ///If the returned list is empty, it means that there no ongoing events related to the queried keyword.
@@ -45,6 +46,7 @@ class EventsRepository
     }
   }
 
+  ///Processes response from http get into a list of event models.
   List<EventModel> _processResponse(Map map)
   {
     List<EventModel> results = [];

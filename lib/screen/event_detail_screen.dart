@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pine_apple/controller/pineapple_context.dart';
-import 'package:pine_apple/model/chat_message_model.dart';
-import 'package:pine_apple/model/backend.dart';
-import 'package:pine_apple/model/events_repository.dart';
 import 'package:pine_apple/model/event_model.dart';
-import 'package:pine_apple/screen/screen.dart';
 
 class EventDetailsScreen extends StatelessWidget {
 
@@ -136,21 +131,4 @@ class EventDetailsScreen extends StatelessWidget {
   }
 }
 
-class EventDetailScreenController
-{
-  Future<void> onJoinTapped(BuildContext context, EventModel event) async
-  {
-    ChatRepository _chatRepository = PineAppleContext.chatRepository;
 
-    GroupChatInfo info = await _chatRepository.getEventGroupChatInfo(event.id);
-    if(info==null)
-      {
-        info = await _chatRepository.createEventGroupChatInfo(event, [PineAppleContext.currentUid]);
-      }
-    else{
-      await _chatRepository.addMemberToGroup(PineAppleContext.currentUid, info.groupChatUid, type: ChatType.EVENT);
-    }
-    Navigator.pushNamed(context, Routes.CHAT_SCREEN, arguments: { Routes.ARG_GROUP_CHAT_INFO:info});
-  }
-
-}

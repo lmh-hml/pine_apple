@@ -71,7 +71,7 @@ class EventModel {
   }
 }
 
-///Processes an event resource response from EvenfindDA into EventModel object.
+///Helper function which Processes an event resource response from EvenfindDA into EventModel object.
 EventModel _fromEventFindDAResponse(Map map) {
   EventModel ev = EventModel(
     id: map['id']?.toString() ?? "",
@@ -93,7 +93,7 @@ EventModel _fromEventFindDAResponse(Map map) {
   return ev;
 }
 
-///Processes the 'images' resource from EventFindDA to a single image url.
+///Heloer function which Processes the 'images' resource from EventFindDA to a single image url.
 String _processResponseImages(Map map) {
   String imageUrl = "";
   // imageUrl =  'https:'+map['images'][0]['original_url'] +'?'?? null;

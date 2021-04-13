@@ -140,7 +140,7 @@ class ChatRepository {
   }
 
   ///Gets the chat session with the specified uid.
-  ChatMessagesReference getChat(String uid)
+  ChatMessagesReference getChatReference(String uid)
   {
     return ChatMessagesReference(uid);
   }
@@ -195,7 +195,6 @@ class ChatMessagesReference{
   ///Clean up method
   void dispose() {
     _messageStream.close();
-
   }
 
   ///Returns a stream whose snapshot contains a list of chat messages sorted by their timestamps.
@@ -215,6 +214,7 @@ class ChatGroupReference
   {
     _groupReference = FirebaseDatabase.instance.reference().child(_GROUPS).child(uid);
   }
+
 
   Future<GroupChatInfo> getGroupInfo() async
   {

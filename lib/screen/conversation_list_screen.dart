@@ -1,12 +1,10 @@
 import 'package:intl/intl.dart';
+import 'package:pine_apple/controller/conversation_list_screen_controller.dart';
 import 'package:pine_apple/import_firebase.dart';
 import 'package:pine_apple/model/chat_message_model.dart';
-import 'package:pine_apple/model/user_profile_model.dart';
-import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/screen/screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:rxdart/rxdart.dart';
 
 
 class ConversationListScreen extends StatefulWidget {
@@ -96,51 +94,4 @@ class _ChatPageState extends State<ConversationListScreen> {
     );
   }
 }
-class ConversationListController
-{
-  final ChatRepository _repository = ChatRepository();
-  final UserProfileReference userProfileReference;
-  StreamController<List<GroupChatInfo>> _stream = BehaviorSubject();
-  List<GroupChatInfo> _chatList = [];
-  bool searching = false;
 
-
-  ConversationListController( this.userProfileReference)
-  {
-    userProfileReference.getJoinedGroupsStream.listen((event) async {
-        _chatList = await _repository.getMultipleChatGroupInfo(event);
-        if(!searching)_stream.add(_chatList);
-    });
-  }
-
-  ///Gets a snapshot of the groups that this user is a member of.
-  Future<List<GroupChatInfo>> getGroupList() async
-  {
-    List<String> l = await userProfileReference.getJoinedGroups();
-    List<GroupChatInfo> results = await _repository.getMultipleChatGroupInfo(l);
-    return results;
-  }
-
-  Future<void> onQuery(String string)
-  {
-    searching = true;
-    List<GroupChatInfo> results = [];
-    for(GroupChatInfo info in _chatList)
-      {
-        if(info.groupChatName.contains(string))
-          {
-            results.add(info);
-          }
-      }
-    _stream.add(results);
-  }
-
-  void onClear()
-  {
-    searching = false;
-    _stream.add(_chatList);
-  }
-
-  ///Gets the stream that publishes user's chat list and updates whenever the user join/leaves a group
-  Stream<List<GroupChatInfo>> get joinedGroups => _stream.stream;
-}

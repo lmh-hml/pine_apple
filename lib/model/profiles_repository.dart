@@ -8,9 +8,11 @@ import 'chat_repository.dart';
 ///Model serving as link between the profiles section in database and the app.
 class ProfilesRepository {
   ///DatabaseReference to the profiles of users of the app.
-  DatabaseReference  _databaseReference = FirebaseDatabase.instance.reference().child("users");
+  DatabaseReference  _databaseReference;
 
-  ProfilesRepository();
+  ProfilesRepository({DatabaseReference reference}):
+      _databaseReference = reference ??FirebaseDatabase.instance.reference().child("users");
+
   ///Gets a snapshot of the profile of the user with the specified uid.
   Future<UserProfile> getUserProfile(String uid) async {
     DatabaseReference ref = _databaseReference.child(uid);

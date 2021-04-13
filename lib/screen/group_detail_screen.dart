@@ -1,11 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:pine_apple/controller/group_detail_screen_controller.dart';
 import 'package:pine_apple/import_firebase.dart';
 import 'package:pine_apple/model/chat_message_model.dart';
 import 'package:pine_apple/model/user_profile_model.dart';
-import 'package:pine_apple/model/backend.dart';
 import 'screen.dart';
 
 class GroupDetailsScreen extends StatelessWidget {
@@ -231,18 +230,4 @@ class GroupDetailsScreen extends StatelessWidget {
   }
 }
 
-class GroupDetailsScreenController {
-  ChatGroupReference _chatGroupReference;
 
-  ///CONSTRUCTOR
-  GroupDetailsScreenController(String uid)
-      : _chatGroupReference = ChatGroupReference(uid);
-
-  Future<GroupChatInfo> getGroupChatInfo() async {
-    return await _chatGroupReference.getGroupInfo();
-  }
-
-  Future<List<UserProfile>> getUserProfileList(List<String> uids) async {
-    return await PineAppleContext.profilesRepository.getMultipleProfiles(uids);
-  }
-}

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:pine_apple/model/auth_service.dart';
-import 'screen.dart';
+import 'package:pine_apple/controller/settings_screen_controller.dart';
+
 
 class SettingsScreen extends StatelessWidget {
 
@@ -112,14 +111,3 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class SettingsController
-{
-  AuthService authService;
-  SettingsController(this.authService);
-
-  Future<void> logout(BuildContext context) async
-  {
-    await authService.signOut();
-    Navigator.of(context).popUntil(ModalRoute.withName(Routes.START_UP));
-  }
-}

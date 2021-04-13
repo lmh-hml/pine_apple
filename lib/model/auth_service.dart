@@ -7,12 +7,18 @@ import '../import_firebase.dart';
 ///Class that handles signing in ,signing out and registering of the app.
 class AuthService {
   ///Instance of Firebase Authentication service.
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  final FirebaseAuth _auth;
   ///Reference to database for creating/deleting new user data.
-  final DatabaseReference _users =
-      FirebaseDatabase.instance.reference().child("users");
-  final ProfilesRepository _profilesRepository = ProfilesRepository();
+  final DatabaseReference _users;
+  final ProfilesRepository _profilesRepository;
+
+
+  AuthService({FirebaseAuth firebaseAuth, DatabaseReference databaseReference}):
+    _auth = firebaseAuth??FirebaseAuth.instance,
+    _users = databaseReference ?? FirebaseDatabase.instance.reference().child("users"),
+    _profilesRepository = (databaseReference==null) ? ProfilesRepository() : ProfilesRepository(reference: databaseReference);
+
+
 
   ///Sign in using the provided email and password. If successful, return a User object containing the user's information.
   ///If unsuccessful, function returns null.

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pine_apple/controller/conversation_list_screen_controller.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
+import 'package:pine_apple/controller/settings_screen_controller.dart';
 import 'screen.dart';
 import 'conversation_list_screen.dart';
-import 'package:pine_apple/model/user_profile_model.dart';
-import 'package:pine_apple/model/profiles_repository.dart';
 import 'package:get/get.dart';
 
 
@@ -23,9 +23,6 @@ class MainScreen extends StatefulWidget {
 }
 class _MainScreenState extends State<MainScreen> {
 
-
-
-
   int pageIndex = 0;
   List<Widget> pages;
   @override
@@ -37,6 +34,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: getAppBar(),

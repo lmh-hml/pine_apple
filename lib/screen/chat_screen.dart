@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:pine_apple/StreamChatMessageList.dart';
+import 'package:pine_apple/controller/chat_screen_controller.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
 import 'package:pine_apple/import_firebase.dart';
-import 'package:pine_apple/model/chat_message_model.dart';
 import 'package:pine_apple/model/user_profile_model.dart';
-import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/screen/screen.dart';
-import 'group_detail_screen.dart';
-import 'message_entry_bar.dart';
+import 'widgets/StreamChatMessageList.dart';
+import 'widgets/message_entry_bar.dart';
 
 
 class ChatScreen extends StatefulWidget {
   final ChatController controller;
-
   ChatScreen(this.controller);
 
   @override
@@ -110,40 +107,3 @@ class _ChatScreenState extends State<ChatScreen> {
 
 }
 
-class ChatController {
-
-  final ChatMessagesReference messagesReference;
-  final ChatGroupReference chatGroupReference;
-  final UserProfile userProfile;
-  final GroupChatInfo groupChatInfo;
-
-  ChatController(
-      {this.userProfile,
-      this.groupChatInfo}):
-      messagesReference = ChatMessagesReference(groupChatInfo.groupChatUid),
-      chatGroupReference = ChatGroupReference(groupChatInfo.groupChatUid);
-
-  ///Gets the name of the current group.
-  String get groupName =>  groupChatInfo.groupChatName;
-  ///Gets the stream that fires whenever a new message is uploaded.
-  Stream<List<ChatMessage>> get messageStream => messagesReference.stream;
-  ///Controller function to upload message to the database
-  Future<void> uploadMessage(String text) async
-  {
-    return await messagesReference.addMessage(
-        ChatMessage(
-            senderName: userProfile.username,
-            senderUid: userProfile.uid,
-            timestamp: DateTime.now().millisecondsSinceEpoch,
-            text: text
-        )
-    );
-  }
-  Future<void> onRemoveUser() async
-  {
-    await PineAppleContext.chatRepository.removeMemberFromGroup(PineAppleContext.currentUid, groupChatInfo.groupChatUid);
-  }
-
-
-
-}

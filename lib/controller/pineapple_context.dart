@@ -14,6 +14,7 @@ class _PineAppleContextImpl
   UserProfile _profile;
   UserProfileReference _profileReference;
   bool _init = false;
+  StreamSubscription<UserProfile> _profileSubscription;
 
   _PineAppleContextImpl._();
 
@@ -34,12 +35,18 @@ class _PineAppleContextImpl
     {
       _uid = user.uid;
       _profileReference = UserProfileReference(_uid);
+      _profile = await _profileReference.profileStream.first;
+      _profileSubscription = _profileReference.profileStream.listen((event) {
+        print("UPDATED: NEW PROFILE IS: ${event.map.toString()}");
+        _profile = event;
+      });
       print("From context: Init with uid $_uid");
     }
     else
     {
       _uid=null;
       _profile = null;
+      await _profileSubscription.cancel();
       print("From context: logout with uid $_uid");
     }
   }
@@ -58,7 +65,7 @@ class _PineAppleContextImpl
   UserProfileReference get currentUser{
     return _profileReference;
   }
-  UserProfile get currentUserprofile => _profileReference.currentUserProfile;
+  UserProfile get currentUserprofile => _profile;
 }
 
 

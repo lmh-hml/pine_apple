@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pine_apple/controller/login_page_controller.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
 import 'package:pine_apple/import_firebase.dart';
-import 'package:rxdart/rxdart.dart';
-
-
 
 class LoginScreen extends StatefulWidget {
 
