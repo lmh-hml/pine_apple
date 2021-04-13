@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
 import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/StreamChatMessageList.dart';
 import 'package:pine_apple/screen/message_entry_bar.dart';

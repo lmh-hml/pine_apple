@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/backend.dart';
 
 import '../import_firebase.dart';

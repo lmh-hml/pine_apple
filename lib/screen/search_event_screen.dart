@@ -22,35 +22,43 @@ class _SearchEventState extends State<SearchEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 1,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back,color: Colors.black,),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text("Search for a event",style: TextStyle( fontSize: 18 ,fontWeight: FontWeight.w600, color: Colors.black54),),
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        flexibleSpace: SafeArea(
-          child: Container(
-            padding: EdgeInsets.only(right: 16),
-            child: Stack(
-              children: <Widget>[
-                Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      onPressed: (){
-                        //Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfile()));
-                      },
-                      icon: Icon(Icons.check),
-                    )
-                ),
-
-              ],
+        title: TextField(
+          controller: _searchBarController,
+          onSubmitted: (text)=>controller.doQuery(text),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            prefixIcon: Icon(
+              Icons.search,
+              color: Colors.black,
             ),
+            hintText: 'Enter a keyword here...',
           ),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+          ),
+          cursorColor: Colors.black,
         ),
+        actions: [
+          Container(
+            margin: EdgeInsets.only(right: 30),
+            child: Obx(() {
+              return controller.searching.value ?
+              Center(child:CircularProgressIndicator()):
+              Icon(Icons.check, color: Colors.black,);
+            }),
+          ),
+        ],
+
       ),
       body: getBody(),
     );
@@ -60,34 +68,6 @@ class _SearchEventState extends State<SearchEvent> {
     return SingleChildScrollView(
       child: Column(
         children: <Widget> [
-          Padding(
-            padding: EdgeInsets.all(15.0),
-            child: Container(
-              width: size.width - 30,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                color: Color.fromARGB(150,211,211,211),
-              ),
-              child: TextField(
-                controller: _searchBarController,
-                onSubmitted: (text)=>controller.doQuery(text),
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    ),
-                    hintText: 'Enter a keyword here...',
-                ),
-                style: TextStyle(
-                    color: Colors.black,
-                ),
-                cursorColor: Colors.black,
-              ),
-            ),
-          ),
-
           StreamBuilder(
               stream: controller.resultsStream,
               builder: (context, snapshot){
@@ -123,12 +103,17 @@ class SearchEventScreenController
 {
   EventsRepository _eventsRepository = EventsRepository();
   StreamController<List<EventModel>> _resultsStream = BehaviorSubject();
+  var searching = false.obs;
 
+  ///Perform a query based on the indicated keywords
   Future<void> doQuery(String keyword) async
   {
+    searching.value = true;
     List<EventModel> results =  await _eventsRepository.searchEventWithKeyword(keyword);
     _resultsStream.add(results);
+    searching.value = false;
   }
 
+  ///Stream that updates whenever results from doQuery() is available.
   Stream<List<EventModel>> get resultsStream=>_resultsStream.stream;
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
 import 'package:pine_apple/import_firebase.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
-import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
+import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/backend.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:pine_apple/screen/screen.dart';

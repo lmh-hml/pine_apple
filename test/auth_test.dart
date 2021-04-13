@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:developer';
 import 'package:pine_apple/model/backend.dart';
-import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/user_profile_model.dart';
 
 void main() async
 {

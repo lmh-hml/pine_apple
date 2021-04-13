@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
 import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/model/events_repository.dart';
 import 'package:pine_apple/model/event_model.dart';

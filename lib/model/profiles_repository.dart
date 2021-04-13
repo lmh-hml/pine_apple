@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
+
 import '../import_firebase.dart';
-import 'UserProfile.dart';
+import 'user_profile_model.dart';
 import 'package:rxdart/rxdart.dart';
 import 'chat_repository.dart';
 
@@ -49,7 +51,7 @@ class ProfilesRepository {
 class UserProfileReference {
 
   final DatabaseReference _profileReference;
-    StreamController<UserProfile> _profileStreamController = BehaviorSubject();
+  StreamController<UserProfile> _profileStreamController = BehaviorSubject();
   StreamController<List<String>> _groupListStreamController = BehaviorSubject();
   String _uid;
   UserProfile _userProfile;
@@ -67,8 +69,10 @@ class UserProfileReference {
   {
     _profileReference.onValue.listen((event) {
       if (event.snapshot.value != null)
-        _userProfile = UserProfile.fromMap(event.snapshot.value);
-      _profileStreamController.add(_userProfile);
+        {
+          _userProfile = UserProfile.fromMap(event.snapshot.value);
+          _profileStreamController.add(_userProfile);
+        }
     });
 
     _profileReference.child('groups').onValue.listen((event) {
@@ -79,7 +83,6 @@ class UserProfileReference {
             list.add(item.toString());
           }
         }
-      for(var item in list)print(item.toString());
       _groupListStreamController.add(list);
     });
 

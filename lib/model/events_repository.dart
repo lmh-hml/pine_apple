@@ -40,7 +40,7 @@ class EventsRepository
       return _processResponse(resp);
     }on TimeoutException catch(e)
     {
-      print('QUERYING EVENTS EXCEEDED TIMEOUT OF % SECONDS, RETRYING');
+      print('QUERYING EVENTS EXCEEDED TIMEOUT OF 5 SECONDS, RETRYING');
       return [];
     }
   }

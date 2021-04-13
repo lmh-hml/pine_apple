@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/backend.dart';
-import 'model/ChatMessage.dart';
+import 'model/chat_message_model.dart';
 
 
 

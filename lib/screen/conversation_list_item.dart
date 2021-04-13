@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
 
 class ConversationListItem extends StatefulWidget {
   final GroupChatInfo groupInfo;

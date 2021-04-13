@@ -17,7 +17,7 @@ export 'conversation_list_item.dart';
 export 'conversation_list_screen.dart';
 export 'chat.dart';
 import 'package:get/get.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
 import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/screen/edit_profile_screen.dart';
 import 'package:pine_apple/screen/event_detail_screen.dart';

@@ -3,7 +3,7 @@ import 'package:pine_apple/model/event_model.dart';
 import '../import_firebase.dart';
 import 'backend.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
 
 const String _CHATS = "chats";
 const String _GROUPS = "groups";

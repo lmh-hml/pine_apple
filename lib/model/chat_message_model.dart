@@ -1,10 +1,5 @@
-import 'dart:collection';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:pine_apple/model/backend.dart';
-
-import '../import_firebase.dart';
-import 'event_model.dart';
-
 ///Class representing a Chat Message
 class ChatMessage {
 

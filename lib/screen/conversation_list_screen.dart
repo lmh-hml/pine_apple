@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:pine_apple/import_firebase.dart';
-import 'package:pine_apple/model/ChatMessage.dart';
-import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/chat_message_model.dart';
+import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/backend.dart';
 import 'package:pine_apple/screen/screen.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +108,6 @@ class ConversationListController
   ConversationListController( this.userProfileReference)
   {
     userProfileReference.getJoinedGroupsStream.listen((event) async {
-        print("Listening for ${userProfileReference.currentUserProfile.uid}");
         _chatList = await _repository.getMultipleChatGroupInfo(event);
         if(!searching)_stream.add(_chatList);
     });

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pine_apple/controller/pineapple_context.dart';
 import 'screen.dart';
 import 'conversation_list_screen.dart';
-import 'package:pine_apple/model/UserProfile.dart';
+import 'package:pine_apple/model/user_profile_model.dart';
 import 'package:pine_apple/model/profiles_repository.dart';
 import 'package:get/get.dart';
 
